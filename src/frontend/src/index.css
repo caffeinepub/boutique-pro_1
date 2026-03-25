@@ -1,0 +1,79 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+
+    /* Luxury Boutique: White / Soft Pink / Deep Navy */
+    --background: 0.99 0.002 0;
+    --foreground: 0.18 0.04 250;
+
+    --card: 1 0 0;
+    --card-foreground: 0.18 0.04 250;
+
+    --popover: 1 0 0;
+    --popover-foreground: 0.18 0.04 250;
+
+    /* Navy primary */
+    --primary: 0.28 0.08 252;
+    --primary-foreground: 1 0 0;
+
+    /* Soft pink secondary */
+    --secondary: 0.95 0.04 0;
+    --secondary-foreground: 0.28 0.08 252;
+
+    --muted: 0.97 0.01 0;
+    --muted-foreground: 0.52 0.02 250;
+
+    /* Hot pink accent */
+    --accent: 0.72 0.22 355;
+    --accent-foreground: 1 0 0;
+
+    --destructive: 0.577 0.245 27.325;
+    --destructive-foreground: 1 0 0;
+
+    --border: 0.93 0.015 0;
+    --input: 0.93 0.015 0;
+    --ring: 0.72 0.22 355;
+
+    --chart-1: 0.646 0.222 41.116;
+    --chart-2: 0.6 0.118 184.704;
+    --chart-3: 0.398 0.07 227.392;
+    --chart-4: 0.828 0.189 84.429;
+    --chart-5: 0.769 0.188 70.08;
+
+    --sidebar: 0.985 0 0;
+    --sidebar-foreground: 0.18 0.04 250;
+    --sidebar-primary: 0.28 0.08 252;
+    --sidebar-primary-foreground: 1 0 0;
+    --sidebar-accent: 0.95 0.04 0;
+    --sidebar-accent-foreground: 0.28 0.08 252;
+    --sidebar-border: 0.93 0.015 0;
+    --sidebar-ring: 0.72 0.22 355;
+
+    /* Custom boutique tokens */
+    --navy: 0.28 0.08 252;
+    --pink-light: 0.94 0.05 355;
+    --pink-mid: 0.85 0.12 355;
+    --pink-hot: 0.72 0.22 355;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: "Playfair Display", serif;
+  }
+}
