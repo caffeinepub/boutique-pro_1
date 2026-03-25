@@ -1,18 +1,12 @@
 import AccessControl "./access-control";
-import Prim "mo:prim";
 import Runtime "mo:core/Runtime";
 
 mixin (accessControlState : AccessControl.AccessControlState) {
-  // Initialize auth (first caller becomes admin, others become users)
+  // Hardcoded admin token
+  let ADMIN_TOKEN : Text = "MYSHOP2024";
+
   public shared ({ caller }) func _initializeAccessControlWithSecret(userSecret : Text) : async () {
-    switch (Prim.envVar<system>("CAFFEINE_ADMIN_TOKEN")) {
-      case (null) {
-        Runtime.trap("CAFFEINE_ADMIN_TOKEN environment variable is not set");
-      };
-      case (?adminToken) {
-        AccessControl.initialize(accessControlState, caller, adminToken, userSecret);
-      };
-    };
+    AccessControl.initialize(accessControlState, caller, ADMIN_TOKEN, userSecret);
   };
 
   public query ({ caller }) func getCallerUserRole() : async AccessControl.UserRole {
@@ -20,7 +14,6 @@ mixin (accessControlState : AccessControl.AccessControlState) {
   };
 
   public shared ({ caller }) func assignCallerUserRole(user : Principal, role : AccessControl.UserRole) : async () {
-    // Admin-only check happens inside
     AccessControl.assignRole(accessControlState, caller, user, role);
   };
 

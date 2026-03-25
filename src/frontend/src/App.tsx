@@ -88,6 +88,14 @@ const SAMPLE_PRODUCTS: Product[] = [
   },
 ];
 
+// Check if the current URL contains the admin flag
+function isAdminUrl(): boolean {
+  return (
+    window.location.search.includes("admin") ||
+    window.location.hash.includes("admin")
+  );
+}
+
 export default function App() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
@@ -99,6 +107,9 @@ export default function App() {
   const { data: backendProducts, isLoading } = useGetProducts();
 
   const isLoggedInAdmin = !!identity && !!isAdmin;
+
+  // Show gear icon when: already logged in OR visiting the ?admin / #admin URL
+  const showGearIcon = !!identity || isAdminUrl();
 
   const allProducts: Product[] = useMemo(() => {
     if (backendProducts && backendProducts.length > 0) return backendProducts;
@@ -156,8 +167,8 @@ export default function App() {
               />
             </div>
 
-            {/* Gear icon — admin only or when logged in to claim admin */}
-            {(isLoggedInAdmin || !!identity) && (
+            {/* Gear icon — visible when logged in OR when ?admin / #admin is in the URL */}
+            {showGearIcon && (
               <button
                 type="button"
                 onClick={() => setAdminOpen(true)}
@@ -263,7 +274,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-border py-6 mt-8">
-        <div className="max-w-6xl mx-auto px-4 text-center">
+        <div className="max-w-6xl mx-auto px-4 text-center relative">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Boutique Pro. Built with ❤️ using{" "}
             <a
@@ -275,6 +286,16 @@ export default function App() {
               caffeine.ai
             </a>
           </p>
+
+          {/* Hidden admin entry point — tiny, low-opacity dot in the bottom-right corner */}
+          <button
+            type="button"
+            onClick={() => setAdminOpen(true)}
+            aria-label="Admin access"
+            data-ocid="catalog.hidden_admin_button"
+            className="absolute bottom-0 right-0 w-5 h-5 opacity-0 hover:opacity-10 transition-opacity rounded-full"
+            title=""
+          />
         </div>
       </footer>
 
