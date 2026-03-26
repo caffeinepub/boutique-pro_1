@@ -88,6 +88,21 @@ export function useDeleteProduct() {
   });
 }
 
+export function useClearAllProducts() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error("Not connected");
+      await actor.clearAllProducts();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["productCount"] });
+    },
+  });
+}
+
 export function useInitializeAdmin() {
   const { actor } = useActor();
   const queryClient = useQueryClient();

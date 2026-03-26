@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import {
   useAddProduct,
+  useClearAllProducts,
   useDeleteProduct,
   useGetProducts,
   useInitializeAdmin,
@@ -61,12 +62,12 @@ export function AdminModal({ onClose }: AdminModalProps) {
   const addProduct = useAddProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
+  const clearAllProducts = useClearAllProducts();
   const initializeAdmin = useInitializeAdmin();
 
   const [form, setForm] = useState<ProductForm>({ ...EMPTY_FORM });
   const [editingId, setEditingId] = useState<bigint | null>(null);
   const [adminSecret, setAdminSecret] = useState("");
-  const [clearingAll, setClearingAll] = useState(false);
 
   const isLoggedIn = !!identity;
 
@@ -107,7 +108,6 @@ export function AdminModal({ onClose }: AdminModalProps) {
       category: p.category,
       trending: p.trending,
     });
-    // Scroll to form
     document
       .getElementById("product-form")
       ?.scrollIntoView({ behavior: "smooth" });
@@ -138,19 +138,14 @@ export function AdminModal({ onClose }: AdminModalProps) {
 
   const handleClearAll = async () => {
     if (!window.confirm("Delete all products? This cannot be undone.")) return;
-    setClearingAll(true);
     try {
-      for (const p of products) {
-        await deleteProduct.mutateAsync(p.id);
-      }
+      await clearAllProducts.mutateAsync();
       toast.success("All products deleted");
       setEditingId(null);
       setForm({ ...EMPTY_FORM });
     } catch (err) {
       toast.error("Failed to delete all products");
       console.error(err);
-    } finally {
-      setClearingAll(false);
     }
   };
 
@@ -482,10 +477,10 @@ export function AdminModal({ onClose }: AdminModalProps) {
                       variant="outline"
                       className="w-full border-destructive text-destructive hover:bg-destructive/10"
                       onClick={handleClearAll}
-                      disabled={clearingAll || deleteProduct.isPending}
-                      data-ocid="admin.delete_button"
+                      disabled={clearAllProducts.isPending}
+                      data-ocid="admin.clear_all_button"
                     >
-                      {clearingAll ? (
+                      {clearAllProducts.isPending ? (
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       ) : (
                         <Trash2 className="w-4 h-4 mr-2" />

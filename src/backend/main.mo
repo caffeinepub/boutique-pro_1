@@ -13,6 +13,9 @@ actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
+  // Preserved from previous version to maintain stable variable compatibility
+  stable var ADMIN_TOKEN : Text = "";
+
   // User Profile Type
   public type UserProfile = {
     name : Text;
@@ -81,6 +84,15 @@ actor {
     };
     if (not products.containsKey(id)) { Runtime.trap("Product does not exist") };
     products.remove(id);
+  };
+
+  public shared ({ caller }) func clearAllProducts() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can clear products");
+    };
+    for (key in products.keys().toArray().vals()) {
+      products.remove(key);
+    };
   };
 
   public query func getProduct(id : Nat) : async Product {
