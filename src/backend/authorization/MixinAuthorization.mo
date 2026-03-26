@@ -2,7 +2,7 @@ import AccessControl "./access-control";
 import Runtime "mo:core/Runtime";
 
 mixin (accessControlState : AccessControl.AccessControlState) {
-  // Hardcoded admin token
+  // Hardcoded admin token — kept as a stable binding for upgrade compatibility
   let ADMIN_TOKEN : Text = "MYSHOP2024";
 
   public shared ({ caller }) func _initializeAccessControlWithSecret(userSecret : Text) : async () {

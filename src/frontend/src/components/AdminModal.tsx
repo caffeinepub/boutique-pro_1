@@ -66,6 +66,7 @@ export function AdminModal({ onClose }: AdminModalProps) {
   const [form, setForm] = useState<ProductForm>({ ...EMPTY_FORM });
   const [editingId, setEditingId] = useState<bigint | null>(null);
   const [adminSecret, setAdminSecret] = useState("");
+  const [clearingAll, setClearingAll] = useState(false);
 
   const isLoggedIn = !!identity;
 
@@ -132,6 +133,24 @@ export function AdminModal({ onClose }: AdminModalProps) {
     } catch (err) {
       toast.error("Failed to delete product");
       console.error(err);
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!window.confirm("Delete all products? This cannot be undone.")) return;
+    setClearingAll(true);
+    try {
+      for (const p of products) {
+        await deleteProduct.mutateAsync(p.id);
+      }
+      toast.success("All products deleted");
+      setEditingId(null);
+      setForm({ ...EMPTY_FORM });
+    } catch (err) {
+      toast.error("Failed to delete all products");
+      console.error(err);
+    } finally {
+      setClearingAll(false);
     }
   };
 
@@ -456,6 +475,24 @@ export function AdminModal({ onClose }: AdminModalProps) {
                       </Button>
                     </form>
                   </div>
+
+                  {/* Clear All Products */}
+                  {products.length > 0 && (
+                    <Button
+                      variant="outline"
+                      className="w-full border-destructive text-destructive hover:bg-destructive/10"
+                      onClick={handleClearAll}
+                      disabled={clearingAll || deleteProduct.isPending}
+                      data-ocid="admin.delete_button"
+                    >
+                      {clearingAll ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4 mr-2" />
+                      )}
+                      Clear All Products
+                    </Button>
+                  )}
 
                   <Separator />
 

@@ -20,7 +20,11 @@ import { useMemo, useState } from "react";
 import { AdminModal } from "./components/AdminModal";
 import { ProductCard } from "./components/ProductCard";
 import { useInternetIdentity } from "./hooks/useInternetIdentity";
-import { useGetProducts, useIsAdmin } from "./hooks/useQueries";
+import {
+  useDeleteProduct,
+  useGetProducts,
+  useIsAdmin,
+} from "./hooks/useQueries";
 import type { Product } from "./hooks/useQueries";
 
 const CATEGORIES = ["All", "Fashion", "Home Decor", "Gadgets", "Loot Deals"];
@@ -105,6 +109,7 @@ export default function App() {
   const { identity } = useInternetIdentity();
   const { data: isAdmin } = useIsAdmin();
   const { data: backendProducts, isLoading } = useGetProducts();
+  const deleteProduct = useDeleteProduct();
 
   const isLoggedInAdmin = !!identity && !!isAdmin;
 
@@ -265,6 +270,8 @@ export default function App() {
                   key={product.id.toString()}
                   product={product}
                   index={i}
+                  isAdmin={isLoggedInAdmin}
+                  onDelete={(id) => deleteProduct.mutate(id)}
                 />
               ))}
             </AnimatePresence>
@@ -299,8 +306,8 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Floating Add Button — admin only */}
-      {isLoggedInAdmin && (
+      {/* Floating Add Button — visible to admins or when ?admin is in URL */}
+      {(isLoggedInAdmin || isAdminUrl()) && (
         <motion.button
           type="button"
           onClick={() => setAdminOpen(true)}

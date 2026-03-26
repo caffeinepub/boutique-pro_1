@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, Star } from "lucide-react";
+import { ShoppingBag, Star, Trash2 } from "lucide-react";
 import { motion } from "motion/react";
 import type { Product } from "../hooks/useQueries";
 
@@ -14,9 +14,16 @@ const CATEGORY_COLORS: Record<string, string> = {
 interface ProductCardProps {
   product: Product;
   index: number;
+  isAdmin?: boolean;
+  onDelete?: (id: bigint) => void;
 }
 
-export function ProductCard({ product, index }: ProductCardProps) {
+export function ProductCard({
+  product,
+  index,
+  isAdmin,
+  onDelete,
+}: ProductCardProps) {
   const discount = Math.round(
     ((product.mrp - product.price) / product.mrp) * 100,
   );
@@ -48,6 +55,22 @@ export function ProductCard({ product, index }: ProductCardProps) {
           <span className="absolute top-2 right-2 bg-boutique-navy text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-0.5">
             <Star className="w-2.5 h-2.5 fill-current" /> Trending
           </span>
+        )}
+        {/* Admin delete button */}
+        {isAdmin && onDelete && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDelete(product.id);
+            }}
+            aria-label="Delete product"
+            data-ocid="product.delete_button"
+            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500/80 hover:bg-red-600 text-white flex items-center justify-center shadow-md transition-colors z-10"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         )}
       </div>
 
