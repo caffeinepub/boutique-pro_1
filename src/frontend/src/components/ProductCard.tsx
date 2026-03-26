@@ -1,3 +1,14 @@
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Star, Trash2 } from "lucide-react";
@@ -35,6 +46,7 @@ export function ProductCard({
     <motion.article
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
       className="group flex flex-col bg-card rounded-2xl shadow-card hover:shadow-card-hover transition-shadow duration-300 overflow-hidden"
     >
@@ -51,26 +63,47 @@ export function ProductCard({
             -{discount}%
           </span>
         )}
-        {product.trending && (
+        {product.trending && !isAdmin && (
           <span className="absolute top-2 right-2 bg-boutique-navy text-white text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-0.5">
             <Star className="w-2.5 h-2.5 fill-current" /> Trending
           </span>
         )}
-        {/* Admin delete button */}
+        {/* Admin delete button with confirmation */}
         {isAdmin && onDelete && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onDelete(product.id);
-            }}
-            aria-label="Delete product"
-            data-ocid="product.delete_button"
-            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500/80 hover:bg-red-600 text-white flex items-center justify-center shadow-md transition-colors z-10"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                aria-label="Delete product"
+                data-ocid="product.delete_button"
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500/80 hover:bg-red-600 text-white flex items-center justify-center shadow-md transition-colors z-10"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this product?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  "{product.title}" will be permanently removed from your store.
+                  This cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => onDelete(product.id)}
+                >
+                  Yes, Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
       </div>
 

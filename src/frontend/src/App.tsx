@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { AdminModal } from "./components/AdminModal";
 import { ProductCard } from "./components/ProductCard";
 import { useInternetIdentity } from "./hooks/useInternetIdentity";
@@ -117,9 +118,11 @@ export default function App() {
   const showGearIcon = !!identity || isAdminUrl();
 
   const allProducts: Product[] = useMemo(() => {
+    // Admins always see real backend products (even if empty) — no sample fallback
+    if (isLoggedInAdmin) return backendProducts ?? [];
     if (backendProducts && backendProducts.length > 0) return backendProducts;
     return SAMPLE_PRODUCTS;
-  }, [backendProducts]);
+  }, [backendProducts, isLoggedInAdmin]);
 
   const filtered = useMemo(() => {
     let result = allProducts;
@@ -256,10 +259,12 @@ export default function App() {
           >
             <ShoppingBag className="w-12 h-12 text-boutique-pink-mid mx-auto mb-3" />
             <p className="font-display text-lg font-semibold text-foreground">
-              No products found
+              {isLoggedInAdmin ? "No products yet" : "No products found"}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              Try a different search or category
+              {isLoggedInAdmin
+                ? "Tap the + button to add your first product"
+                : "Try a different search or category"}
             </p>
           </motion.div>
         ) : (
@@ -271,7 +276,12 @@ export default function App() {
                   product={product}
                   index={i}
                   isAdmin={isLoggedInAdmin}
-                  onDelete={(id) => deleteProduct.mutate(id)}
+                  onDelete={(id) => {
+                    deleteProduct.mutate(id, {
+                      onSuccess: () => toast.success("Product deleted"),
+                      onError: () => toast.error("Failed to delete product"),
+                    });
+                  }}
                 />
               ))}
             </AnimatePresence>
